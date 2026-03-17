@@ -69,8 +69,12 @@ class ReasoningAgent:
     def _llm_baslat(self) -> None:
         """LangChain LLM ve ajan bileşenlerini başlatır."""
         try:
-            from langchain.memory import ConversationBufferWindowMemory
             from langchain_openai import ChatOpenAI
+
+            try:
+                from langchain.memory import ConversationBufferWindowMemory
+            except ImportError:
+                ConversationBufferWindowMemory = None
 
             ayar = yapilandirma.llm
 
@@ -89,11 +93,12 @@ class ReasoningAgent:
                 max_tokens=ayar.maks_token,
             )
 
-            self._bellek = ConversationBufferWindowMemory(
-                k=ayar.bellek_pencere_boyutu,
-                memory_key="chat_history",
-                return_messages=True,
-            )
+            if ConversationBufferWindowMemory is not None:
+                self._bellek = ConversationBufferWindowMemory(
+                    k=ayar.bellek_pencere_boyutu,
+                    memory_key="chat_history",
+                    return_messages=True,
+                )
 
             self._llm_kullanilabilir = True
             logger.info(f"LLM başlatıldı: {ayar.model_adi}")

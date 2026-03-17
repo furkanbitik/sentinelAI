@@ -102,6 +102,9 @@ class VisionAgent:
                     "Poz tahmini devre dışı bırakıldı. "
                     "Uyumlu sürüm için: pip install mediapipe==0.10.9"
                 )
+        except Exception as e:
+            self._poz_tahminci = None
+            logger.warning(f"MediaPipe başlatılamadı: {e}. Poz tahmini devre dışı.")
 
         self._baslatildi = True
         logger.info("VisionAgent başarıyla başlatıldı.")

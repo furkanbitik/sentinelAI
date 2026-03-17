@@ -49,16 +49,11 @@ class ChromaDepo:
 
         try:
             import chromadb
-            from chromadb.config import Settings
 
             ayar = yapilandirma.chroma
 
-            self._istemci = chromadb.Client(
-                Settings(
-                    chroma_db_impl="duckdb+parquet",
-                    persist_directory=ayar.kalici_dizin,
-                    anonymized_telemetry=False,
-                )
+            self._istemci = chromadb.PersistentClient(
+                path=ayar.kalici_dizin,
             )
 
             self._koleksiyon = self._istemci.get_or_create_collection(
@@ -91,7 +86,7 @@ class ChromaDepo:
         try:
             import chromadb
 
-            self._istemci = chromadb.Client()
+            self._istemci = chromadb.EphemeralClient()
             self._koleksiyon = self._istemci.get_or_create_collection(
                 name=yapilandirma.chroma.koleksiyon_adi,
             )
