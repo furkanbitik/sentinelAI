@@ -68,26 +68,15 @@ class VisionAgent:
         try:
             from deep_sort_realtime.deepsort_tracker import DeepSort
 
-            gomme = yapilandirma.deepsort.gomme_modeli
-            try:
-                self._tracker = DeepSort(
-                    max_age=yapilandirma.deepsort.maks_yas,
-                    n_init=yapilandirma.deepsort.n_baslangic,
-                    max_iou_distance=yapilandirma.deepsort.maks_iou_mesafesi,
-                    embedder=gomme,
-                )
-                logger.info(f"DeepSORT takipçisi başlatıldı (embedder={gomme}).")
-            except Exception as emb_err:
-                logger.warning(
-                    f"DeepSORT embedder ({gomme}) yüklenemedi: {emb_err}. "
-                    "Embedder olmadan devam ediliyor (sadece IoU takibi)."
-                )
-                self._tracker = DeepSort(
-                    max_age=yapilandirma.deepsort.maks_yas,
-                    n_init=yapilandirma.deepsort.n_baslangic,
-                    max_iou_distance=yapilandirma.deepsort.maks_iou_mesafesi,
-                    embedder=None,
-                )
+            # embedder=None: pkg_resources uyumsuzluğunu önlemek için
+            # yerleşik embedder kullanılmıyor, dummy embedding sağlanıyor.
+            self._tracker = DeepSort(
+                max_age=yapilandirma.deepsort.maks_yas,
+                n_init=yapilandirma.deepsort.n_baslangic,
+                max_iou_distance=yapilandirma.deepsort.maks_iou_mesafesi,
+                embedder=None,
+            )
+            logger.info("DeepSORT takipçisi başlatıldı (IoU tabanlı takip).")
         except Exception as e:
             logger.error(f"DeepSORT başlatılamadı: {e}")
             raise
@@ -230,10 +219,8 @@ class VisionAgent:
             self._tracker.update_tracks([], frame=kare, embeds=[])
             return []
 
-        # Eğer embedder yoksa dummy embedding sağla
-        embeds = None
-        if self._tracker.embedder is None:
-            embeds = [np.zeros(128, dtype=np.float32) for _ in tespitler]
+        # Embedder devre dışı; her tespit için dummy embedding sağla
+        embeds = [np.zeros(128, dtype=np.float32) for _ in tespitler]
 
         # DeepSORT formatına çevir: ([x, y, w, h], confidence, class)
         tracks = self._tracker.update_tracks(
