@@ -15,8 +15,11 @@ import cv2
 
 # ── Yapılandırma ────────────────────────────────────────────────────────────
 
-UCSD_DIZIN = "crowdflow/data/ucsd_raw/UCSD_Anomaly_Dataset"
-CIKIS_DIZIN = "crowdflow/data/videos"
+# Proje kök dizinini bul (scripts/ klasörünün bir üstü)
+PROJE_KOK = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+
+UCSD_DIZIN = os.path.join(PROJE_KOK, "crowdflow", "data", "ucsd_raw", "UCSD_Anomaly_Dataset")
+CIKIS_DIZIN = os.path.join(PROJE_KOK, "crowdflow", "data", "videos")
 FPS = 10
 
 # ── Klasörleri Oluştur ──────────────────────────────────────────────────────
