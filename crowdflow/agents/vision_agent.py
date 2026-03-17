@@ -68,13 +68,15 @@ class VisionAgent:
         try:
             from deep_sort_realtime.deepsort_tracker import DeepSort
 
+            # embedder=None: pkg_resources uyumsuzluğunu önlemek için
+            # yerleşik embedder kullanılmıyor, dummy embedding sağlanıyor.
             self._tracker = DeepSort(
                 max_age=yapilandirma.deepsort.maks_yas,
                 n_init=yapilandirma.deepsort.n_baslangic,
                 max_iou_distance=yapilandirma.deepsort.maks_iou_mesafesi,
-                embedder=yapilandirma.deepsort.gomme_modeli,
+                embedder=None,
             )
-            logger.info("DeepSORT takipçisi başlatıldı.")
+            logger.info("DeepSORT takipçisi başlatıldı (IoU tabanlı takip).")
         except Exception as e:
             logger.error(f"DeepSORT başlatılamadı: {e}")
             raise
@@ -100,6 +102,9 @@ class VisionAgent:
                     "Poz tahmini devre dışı bırakıldı. "
                     "Uyumlu sürüm için: pip install mediapipe==0.10.9"
                 )
+        except Exception as e:
+            self._poz_tahminci = None
+            logger.warning(f"MediaPipe başlatılamadı: {e}. Poz tahmini devre dışı.")
 
         self._baslatildi = True
         logger.info("VisionAgent başarıyla başlatıldı.")
@@ -214,11 +219,16 @@ class VisionAgent:
             Takip sonuçları: [{"id": int, "bbox": (x1,y1,x2,y2)}, ...]
         """
         if not tespitler:
-            self._tracker.update_tracks([], frame=kare)
+            self._tracker.update_tracks([], frame=kare, embeds=[])
             return []
 
+        # Embedder devre dışı; her tespit için dummy embedding sağla
+        embeds = [np.zeros(128, dtype=np.float32) for _ in tespitler]
+
         # DeepSORT formatına çevir: ([x, y, w, h], confidence, class)
-        tracks = self._tracker.update_tracks(tespitler, frame=kare)
+        tracks = self._tracker.update_tracks(
+            tespitler, frame=kare, embeds=embeds
+        )
 
         sonuclar = []
         for track in tracks:
