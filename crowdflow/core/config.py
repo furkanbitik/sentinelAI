@@ -96,8 +96,8 @@ class AnomaliEsikleri:
     yeniden_yapilandirma_esigi: float = 0.02
     panik_hiz_esigi: float = 5.0
     kavga_yogunluk_esigi: float = 0.8
-    darboğaz_hiz_esigi: float = 0.5
-    darboğaz_yogunluk_esigi: float = 0.7
+    darbogaz_hiz_esigi: float = 0.5
+    darbogaz_yogunluk_esigi: float = 0.7
     dusme_dikey_esigi: float = 50.0
     dagilma_merkezden_uzaklik_esigi: float = 3.0
     guven_minimum: float = 0.3
