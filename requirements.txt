@@ -1,7 +1,7 @@
-# CrowdFlow - Kalabalık Anomali Tespit Sistemi Bağımlılıkları
+# CrowdFlow - Suç Tespit ve Sosyolojik Analiz Sistemi
 
-# Bilgisayar Görüşü
-ultralytics>=8.0.0
+# Bilgisayar Görüşü (YOLO26 için ultralytics>=8.4.30 gerekli)
+ultralytics>=8.4.30
 opencv-python>=4.8.0
 mediapipe>=0.10.0
 
